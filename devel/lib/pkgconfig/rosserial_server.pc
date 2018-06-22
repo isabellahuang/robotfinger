@@ -1,0 +1,8 @@
+prefix=/home/isabella/catkin_ws/devel
+
+Name: rosserial_server
+Description: Description of rosserial_server
+Version: 0.7.7
+Cflags: -I/home/isabella/catkin_ws/src/rosserial/rosserial_server/include
+Libs: -L/home/isabella/catkin_ws/devel/lib 
+Requires: roscpp rosserial_msgs std_msgs topic_tools

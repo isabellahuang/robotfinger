@@ -1,0 +1,8 @@
+prefix=/home/isabella/catkin_ws/devel
+
+Name: royale_in_ros
+Description: Description of royale_in_ros
+Version: 0.0.1
+Cflags: 
+Libs: -L/home/isabella/catkin_ws/devel/lib 
+Requires: 

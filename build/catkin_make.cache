@@ -1,0 +1,2 @@
+point_cloud_analyzer:sampleROS
+-DCATKIN_DEVEL_PREFIX=/home/isabella/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/isabella/catkin_ws/install -G Unix Makefiles

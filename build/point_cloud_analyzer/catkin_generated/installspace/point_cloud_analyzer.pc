@@ -1,0 +1,8 @@
+prefix=/home/isabella/catkin_ws/install
+
+Name: point_cloud_analyzer
+Description: Description of point_cloud_analyzer
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/isabella/catkin_ws/install/lib 
+Requires: 
