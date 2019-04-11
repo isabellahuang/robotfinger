@@ -68,7 +68,10 @@ point_cloud_analyzer/CMakeFiles/pcl_analyze.dir/src/pcl_analyze.cpp.o
  /opt/ros/kinetic/include/sensor_msgs/Image.h
  /opt/ros/kinetic/include/sensor_msgs/PointCloud2.h
  /opt/ros/kinetic/include/sensor_msgs/PointField.h
+ /opt/ros/kinetic/include/std_msgs/Float32.h
  /opt/ros/kinetic/include/std_msgs/Header.h
+ /opt/ros/kinetic/include/std_msgs/String.h
+ /opt/ros/kinetic/include/std_msgs/UInt32.h
  /opt/ros/kinetic/include/xmlrpcpp/XmlRpcDecl.h
  /opt/ros/kinetic/include/xmlrpcpp/XmlRpcValue.h
  /usr/include/eigen3/Eigen/Cholesky
@@ -308,7 +311,11 @@ point_cloud_analyzer/CMakeFiles/pcl_analyze.dir/src/pcl_analyze.cpp.o
  /usr/include/pcl-1.7/pcl/exceptions.h
  /usr/include/pcl-1.7/pcl/features/feature.h
  /usr/include/pcl-1.7/pcl/features/impl/feature.hpp
+ /usr/include/pcl-1.7/pcl/features/impl/integral_image2D.hpp
+ /usr/include/pcl-1.7/pcl/features/impl/integral_image_normal.hpp
  /usr/include/pcl-1.7/pcl/features/impl/normal_3d.hpp
+ /usr/include/pcl-1.7/pcl/features/integral_image2D.h
+ /usr/include/pcl-1.7/pcl/features/integral_image_normal.h
  /usr/include/pcl-1.7/pcl/features/normal_3d.h
  /usr/include/pcl-1.7/pcl/filters/boost.h
  /usr/include/pcl-1.7/pcl/filters/filter.h

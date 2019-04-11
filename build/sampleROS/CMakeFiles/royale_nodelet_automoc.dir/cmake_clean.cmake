@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
-  "royale_in_ros_automoc.cpp"
   "royale_nodelet_automoc.cpp"
+  "royale_in_ros_automoc.cpp"
   "CMakeFiles/royale_nodelet_automoc"
 )
 

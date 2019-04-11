@@ -78,17 +78,6 @@ install/fast: preinstall/fast
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
-
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
-
-.PHONY : edit_cache/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -99,6 +88,17 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # Special rule for the target test
 test:
@@ -111,17 +111,6 @@ test/fast: test
 
 .PHONY : test/fast
 
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: install/strip
-
-.PHONY : install/strip/fast
-
 # Special rule for the target install/local
 install/local: preinstall
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
@@ -132,6 +121,17 @@ install/local: preinstall
 install/local/fast: install/local
 
 .PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: install/strip
+
+.PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -166,231 +166,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_py.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_py: point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_py.dir/rule
-
-.PHONY : std_msgs_generate_messages_py
-
-# fast build rule for target.
-std_msgs_generate_messages_py/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_py.dir/build.make point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_py.dir/build
-.PHONY : std_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_py.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_py.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_py.dir/rule
-
-# Convenience name for target.
-roscpp_generate_messages_py: point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_py.dir/rule
-
-.PHONY : roscpp_generate_messages_py
-
-# fast build rule for target.
-roscpp_generate_messages_py/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_py.dir/build.make point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_py.dir/build
-.PHONY : roscpp_generate_messages_py/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_eus: point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/rule
-
-.PHONY : rosgraph_msgs_generate_messages_eus
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_eus/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build.make point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_eus.dir/build
-.PHONY : rosgraph_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_nodejs: point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : rosgraph_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_nodejs/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build
-.PHONY : rosgraph_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_cpp.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-roscpp_generate_messages_cpp: point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_cpp.dir/rule
-
-.PHONY : roscpp_generate_messages_cpp
-
-# fast build rule for target.
-roscpp_generate_messages_cpp/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_cpp.dir/build.make point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_cpp.dir/build
-.PHONY : roscpp_generate_messages_cpp/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_cpp: point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : rosgraph_msgs_generate_messages_cpp
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_cpp/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build.make point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/build
-.PHONY : rosgraph_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_cpp: point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : std_msgs_generate_messages_cpp
-
-# fast build rule for target.
-std_msgs_generate_messages_cpp/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_cpp.dir/build.make point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_cpp.dir/build
-.PHONY : std_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_eus.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_eus.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-roscpp_generate_messages_eus: point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_eus.dir/rule
-
-.PHONY : roscpp_generate_messages_eus
-
-# fast build rule for target.
-roscpp_generate_messages_eus/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_eus.dir/build.make point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_eus.dir/build
-.PHONY : roscpp_generate_messages_eus/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_py: point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/rule
-
-.PHONY : rosgraph_msgs_generate_messages_py
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_py/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build.make point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_py.dir/build
-.PHONY : rosgraph_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_lisp: point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : rosgraph_msgs_generate_messages_lisp
-
-# fast build rule for target.
-rosgraph_msgs_generate_messages_lisp/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build.make point_cloud_analyzer/CMakeFiles/rosgraph_msgs_generate_messages_lisp.dir/build
-.PHONY : rosgraph_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-roscpp_generate_messages_nodejs: point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_nodejs.dir/rule
-
-.PHONY : roscpp_generate_messages_nodejs
-
-# fast build rule for target.
-roscpp_generate_messages_nodejs/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_nodejs.dir/build.make point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_nodejs.dir/build
-.PHONY : roscpp_generate_messages_nodejs/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_nodejs: point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : std_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-std_msgs_generate_messages_nodejs/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build.make point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_nodejs.dir/build
-.PHONY : std_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_lisp.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-roscpp_generate_messages_lisp: point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
-
-.PHONY : roscpp_generate_messages_lisp
-
-# fast build rule for target.
-roscpp_generate_messages_lisp/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_lisp.dir/build.make point_cloud_analyzer/CMakeFiles/roscpp_generate_messages_lisp.dir/build
-.PHONY : roscpp_generate_messages_lisp/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_eus.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_eus: point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_eus.dir/rule
-
-.PHONY : std_msgs_generate_messages_eus
-
-# fast build rule for target.
-std_msgs_generate_messages_eus/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_eus.dir/build
-.PHONY : std_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
-.PHONY : point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-std_msgs_generate_messages_lisp: point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : std_msgs_generate_messages_lisp
-
-# fast build rule for target.
-std_msgs_generate_messages_lisp/fast:
-	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make point_cloud_analyzer/CMakeFiles/std_msgs_generate_messages_lisp.dir/build
-.PHONY : std_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
 point_cloud_analyzer/CMakeFiles/pcl_analyze.dir/rule:
 	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/pcl_analyze.dir/rule
 .PHONY : point_cloud_analyzer/CMakeFiles/pcl_analyze.dir/rule
@@ -406,6 +181,21 @@ pcl_analyze/fast:
 .PHONY : pcl_analyze/fast
 
 # Convenience name for target.
+point_cloud_analyzer/CMakeFiles/auto_log.dir/rule:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/auto_log.dir/rule
+.PHONY : point_cloud_analyzer/CMakeFiles/auto_log.dir/rule
+
+# Convenience name for target.
+auto_log: point_cloud_analyzer/CMakeFiles/auto_log.dir/rule
+
+.PHONY : auto_log
+
+# fast build rule for target.
+auto_log/fast:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/auto_log.dir/build.make point_cloud_analyzer/CMakeFiles/auto_log.dir/build
+.PHONY : auto_log/fast
+
+# Convenience name for target.
 point_cloud_analyzer/CMakeFiles/pcl_processing.dir/rule:
 	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 point_cloud_analyzer/CMakeFiles/pcl_processing.dir/rule
 .PHONY : point_cloud_analyzer/CMakeFiles/pcl_processing.dir/rule
@@ -419,6 +209,33 @@ pcl_processing: point_cloud_analyzer/CMakeFiles/pcl_processing.dir/rule
 pcl_processing/fast:
 	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/pcl_processing.dir/build.make point_cloud_analyzer/CMakeFiles/pcl_processing.dir/build
 .PHONY : pcl_processing/fast
+
+src/auto_log.o: src/auto_log.cpp.o
+
+.PHONY : src/auto_log.o
+
+# target to build an object file
+src/auto_log.cpp.o:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/auto_log.dir/build.make point_cloud_analyzer/CMakeFiles/auto_log.dir/src/auto_log.cpp.o
+.PHONY : src/auto_log.cpp.o
+
+src/auto_log.i: src/auto_log.cpp.i
+
+.PHONY : src/auto_log.i
+
+# target to preprocess a source file
+src/auto_log.cpp.i:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/auto_log.dir/build.make point_cloud_analyzer/CMakeFiles/auto_log.dir/src/auto_log.cpp.i
+.PHONY : src/auto_log.cpp.i
+
+src/auto_log.s: src/auto_log.cpp.s
+
+.PHONY : src/auto_log.s
+
+# target to generate assembly for a file
+src/auto_log.cpp.s:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f point_cloud_analyzer/CMakeFiles/auto_log.dir/build.make point_cloud_analyzer/CMakeFiles/auto_log.dir/src/auto_log.cpp.s
+.PHONY : src/auto_log.cpp.s
 
 src/pcl_analyze.o: src/pcl_analyze.cpp.o
 
@@ -482,28 +299,17 @@ help:
 	@echo "... depend"
 	@echo "... list_install_components"
 	@echo "... install"
-	@echo "... std_msgs_generate_messages_py"
-	@echo "... roscpp_generate_messages_py"
-	@echo "... rosgraph_msgs_generate_messages_eus"
-	@echo "... edit_cache"
-	@echo "... rosgraph_msgs_generate_messages_nodejs"
 	@echo "... rebuild_cache"
-	@echo "... roscpp_generate_messages_cpp"
-	@echo "... rosgraph_msgs_generate_messages_cpp"
-	@echo "... std_msgs_generate_messages_cpp"
-	@echo "... roscpp_generate_messages_eus"
-	@echo "... rosgraph_msgs_generate_messages_py"
-	@echo "... rosgraph_msgs_generate_messages_lisp"
-	@echo "... roscpp_generate_messages_nodejs"
+	@echo "... edit_cache"
 	@echo "... test"
-	@echo "... std_msgs_generate_messages_nodejs"
-	@echo "... roscpp_generate_messages_lisp"
-	@echo "... std_msgs_generate_messages_eus"
-	@echo "... std_msgs_generate_messages_lisp"
 	@echo "... pcl_analyze"
+	@echo "... auto_log"
 	@echo "... pcl_processing"
-	@echo "... install/strip"
 	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... src/auto_log.o"
+	@echo "... src/auto_log.i"
+	@echo "... src/auto_log.s"
 	@echo "... src/pcl_analyze.o"
 	@echo "... src/pcl_analyze.i"
 	@echo "... src/pcl_analyze.s"

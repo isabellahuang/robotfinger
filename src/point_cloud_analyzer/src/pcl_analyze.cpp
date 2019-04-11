@@ -2,8 +2,12 @@
 #include <pcl/point_types.h>
 #include <boost/foreach.hpp>
 #include <math.h>
+#include "std_msgs/String.h"
+#include "std_msgs/Float32.h"
+#include "std_msgs/UInt32.h"
 
 #include <iostream>
+#include <string>
 #include <pcl_ros/point_cloud.h>
 #include <boost/thread/thread.hpp>
 #include <pcl/common/common_headers.h>
@@ -12,13 +16,22 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/visualization/common/common.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/features/integral_image_normal.h>
 
 #include <pcl/console/parse.h>
+
+// Global variables
+ros::Publisher deflection_pub;
+ros::Publisher contact_area_pub;
+ros::Publisher deformed_area_pub;
+
 
 typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 
-bool SAVED = false;
+bool SAVE_TO_PCD = false;
+bool LOAD_FROM_PCD = false;
+bool SET_PARAMS = true;
 
 boost::shared_ptr<pcl::visualization::PCLVisualizer> simpleVis (pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
 {
@@ -26,9 +39,12 @@ boost::shared_ptr<pcl::visualization::PCLVisualizer> simpleVis (pcl::PointCloud<
   // -----Open 3D viewer and add point cloud-----
   // --------------------------------------------
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
-	viewer->setBackgroundColor (0, 0, 0);
+	viewer->setBackgroundColor (255, 255, 255);
 	viewer->addPointCloud<pcl::PointXYZRGB> (cloud, "cloud");
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud");
+	viewer->addPointCloud<pcl::PointXYZRGB> (cloud, "deformed");
+	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "cloud");
+	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "deformed");
+
 	// viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_LUT, pcl::visualization::PCL_VISUALIZER_LUT_JET, "cloud");
 	viewer->addCoordinateSystem (1.0);
 	viewer->initCameraParameters ();
@@ -36,223 +52,294 @@ boost::shared_ptr<pcl::visualization::PCLVisualizer> simpleVis (pcl::PointCloud<
 	return (viewer);
 }
 
-uint32_t getRGB(double z) {
-	double min_z = 0.018; //0.06;
-	double max_z = 0.037;//0.09;
-	double f = (z - min_z) / (max_z - min_z);
+float concavityOfPair(pcl::PointXYZRGB& a, pcl::PointXYZRGB& b, pcl::Normal& an, pcl::Normal bn){
+	float dx = a.x - b.x;
+	float dy = a.y - b.y;
+	float dz = a.z - b.z;
 
-	if (f > 1) {
-		f = 1.0;
-	}
+	float dnx = an.normal_x - bn.normal_x;
+	float dny = an.normal_y - bn.normal_y;
+	float dnz = an.normal_z - bn.normal_z;
 
-
-	double a = (1-f)/0.2;
-	double X = floor(a);
-	double Y = floor(255*(a-X));
-
-	// std::cout << z << " " << X << " " << Y << std::endl;
-	int r = 0;
-	int g = 0;
-	int b = 0;
-	switch((int) X) {
-		case 0: r=255; g=Y; b=0; break;
-		case 1: r=255 - Y; g=255; b=0; break;
-		case 2: r=0; g=255; b=Y;break;
-		case 3: r=0; g=255 - Y; b=255;break;
-		case 4: r=Y; g=0; b=255;break;
-		case 5: r=255; g=0; b=255; break;
-	}
-
-	// std::cout << r << " " << g << " " << b << std::endl;
-	uint32_t rgb = ((uint32_t) r << 16 | (uint32_t)g << 8 | (uint32_t) b);	
-	return rgb;
+	float concavity = dx * dnx + dy * dny + dz * dnz;
 }
 
+float pDist(pcl::PointXYZRGB& a, pcl::PointXYZRGB& b) {
+	return sqrt(pow(a.x - b.x, 2.0) + pow(a.y- b.y, 2.0) + pow(a.z - b.z, 2.0));
+}
+
+float pDistp(pcl::PointXYZ& a, pcl::PointXYZ& b) {
+	return sqrt(pow(a.x - b.x, 2.0) + pow(a.y- b.y, 2.0) + pow(a.z - b.z, 2.0));
+}
+
+float surfaceElementArea(pcl::PointXYZRGB& o, pcl::PointXYZRGB& a1, pcl::PointXYZRGB& a2, pcl::PointXYZRGB& b1, pcl::PointXYZRGB& b2) {
+	if (pcl::isFinite(a1) && pcl::isFinite(a2) && pcl::isFinite(b1) && pcl::isFinite(b2))  {
+		float width = 0.5 * (pDist(o, a1) + pDist(o, a2));
+		float height = 0.5 * (pDist(o, b1) + pDist(o, b2));
+		return width * height;
+	}  
+
+	return 0.0;
+
+}
+
+float surfaceElementAreaP(pcl::PointXYZ& o, pcl::PointXYZ& a1, pcl::PointXYZ& a2, pcl::PointXYZ& b1, pcl::PointXYZ& b2) {
+	float width = 0.5 * (pDistp(o, a1) + pDistp(o, a2));
+	float height = 0.5 * (pDistp(o, b1) + pDistp(o, b2));
+	return width * height;
+}
 
 void callback(const PointCloud::ConstPtr& msg)
 {
 	// printf ("Cloud: width = %d, height = %d\n", msg->width, msg->height);
 	// std::cout << msg->points.size() << std::endl;
+
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_display (new pcl::PointCloud<pcl::PointXYZRGB>);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr deformed_cloud (new pcl::PointCloud<pcl::PointXYZRGB>);
+
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_display_basic (new pcl::PointCloud<pcl::PointXYZ>);
-	pcl::PointCloud<pcl::PointXYZ>::Ptr downsampled_msg (new pcl::PointCloud<pcl::PointXYZ>);
 
-	// Downsample
-	pcl::VoxelGrid<pcl::PointXYZ> sor;
-	sor.setInputCloud(msg);
-	sor.setLeafSize(0.005f, 0.005f, 0.005f);
-	sor.filter(*downsampled_msg);
-	
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr full_membrane (new pcl::PointCloud<pcl::PointXYZRGB>);
+	full_membrane->width = msg->width;
+	full_membrane->height = msg->height;
+	full_membrane->resize(full_membrane->height*full_membrane->width);
 
 
-	float mindistcenter = 9999;
-	float centerdepth = 0;
+	uint8_t r_green = 113;
+	uint8_t g_green = 164;
+	uint8_t b_green = 252;
+	uint32_t green = ((uint32_t) r_green << 16 | (uint32_t)g_green << 8 | (uint32_t)b_green);
 
-	float minz = 99999;
-	float maxz = 0;
-	float minradius3d = 9999;
-	float maxradius3d = 0;
-	float minRadius = 9999;
-  	BOOST_FOREACH (const pcl::PointXYZ& pt, downsampled_msg->points) {
+	uint8_t r_white = 206;
+	uint8_t g_white = 206;
+	uint8_t b_white = 206;
+	uint32_t white = ((uint32_t) r_white << 16 | (uint32_t)g_white << 8 | (uint32_t)b_white);
 
-  		if (std::isnan(pt.x) || std::isnan(pt.y) || std::isnan(pt.z)) {
-  			continue;
-  		}
+	uint8_t r_red =  252;
+	uint8_t g_red = 196;
+	uint8_t b_red = 113;
+	uint32_t red = ((uint32_t) r_red << 16 | (uint32_t)g_red << 8 | (uint32_t)b_red);
 
-  		// printf ("\t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
-  		pcl::PointXYZRGB point;
-  		pcl::PointXYZ point_basic;
+  // ------------------------
+  // -----Get center dot-----
+  // ------------------------
 
-  		point.x = pt.x;
-  		point.y = pt.y;
-  		point.z = pt.z;
+  	int cols[] = {112}; 
+  	int rows[] = {86}; 
+	 pcl::PointXYZRGB track_point;
 
-   		point_basic.x = pt.x;
-  		point_basic.y = pt.y;
-  		point_basic.z = pt.z;
+  	for (size_t c = 0; c < 1; c++) {
+  		int row = rows[c];
+  		int col = cols[c];
+	  	track_point.x = msg->at(col, row).x;
+	  	track_point.y = msg->at(col, row).y;
+	  	track_point.z = msg->at(col, row).z;
 
+	  	std_msgs::Float32 deflection_msg;
+	  	deflection_msg.data = track_point.z;
+		deflection_pub.publish(deflection_msg);
 
-  		if (point.z < minz) {
-  			minz = point.z;
-  		}
+		ros::spinOnce();
 
-  		if (point.z > maxz) {
-  			maxz = point.z;
-  		}
-
-
-  		float radius = sqrt(pt.x*pt.x + pt.y*pt.y);
-  		if (radius < minRadius) {
-  			minRadius = radius;
-  		}
-
-  		// if (radius < 0.022) {
-  		if (radius < 0.022) {
-  		 	float radius3d = sqrt(pt.x*pt.x + pt.y*pt.y + (pt.z-0.06)*(pt.z-0.06));
-  		 	if (radius3d > maxradius3d) {
-  		 		maxradius3d = radius3d;
-  		 	}
-
-  		 	if (radius3d < minradius3d) {
-  		 		minradius3d = radius3d;
-  		 	}
-
-
-  		 	// Default red
-	   		uint8_t r = 255, g = 0;
-	  		uint8_t b = 0;
-	  		uint32_t rgb = ((uint32_t) r << 16 | (uint32_t)g << 8 | (uint32_t)b);	 		
-
-
-  		 	if (radius3d > 0.02) {
-  		 		// Make it green
-		   		r = 0;
-		   		g = 255;
-		  		b = 0;
-		  		rgb = ((uint32_t) r << 16 | (uint32_t)g << 8 | (uint32_t)b);
-  		 	}
-
-  		 	if (radius < mindistcenter) {
-  		 		mindistcenter = radius;
-  		 		centerdepth = pt.z;
-  		 	}
-
-
-	   		// uint32_t rgb = getRGB(radius3d);
-	  		point.rgb = *reinterpret_cast<float*>(&rgb);
-  			cloud_display->points.push_back(point);
-  			cloud_display_basic->points.push_back(point_basic);
-  		}
+	   	uint8_t r = 255, g = 0;
+		uint8_t b = 0;
+		uint32_t rgb = ((uint32_t) r << 16 | (uint32_t)g << 8 | (uint32_t)b);	 		
+		track_point.rgb = *reinterpret_cast<float*>(&rgb);
+		deformed_cloud->points.push_back(track_point); 	 	
   	}
 
 
-  	// std::cout << minRadius << std::endl;
-  	// std::cout << minradius3d << " " <<  maxradius3d << std::endl;
-  	std::cout << centerdepth << std::endl;
-  	// std::cout << minz << " " << maxz << std::endl;
+  	float radius3d_deform_limit = 0.028; //0.028;
+
+	// Create the point cloud for the full membrane
+	for (int c = 0; c < 224; c++) {
+		for (int r = 0; r < 171; r++) {
+			if (pcl::isFinite(full_membrane->at(c, r))) {
+				float radius_2d_squared = pow(msg->at(c, r).x - track_point.x, 2.0) + pow(msg->at(c, r).y - track_point.y, 2.0);
+				float radius3d = sqrt(pow(msg->at(c, r).x - track_point.x, 2.0) + pow(msg->at(c, r).y - track_point.y, 2.0) + pow(msg->at(c, r).z - 0.09, 2.0));
+
+				// 2D radius to check whether on membrane or not
+				// if (radius_2d_squared < 0.0009) {
+				if (radius_2d_squared < 0.0012) {
+
+					full_membrane->at(c, r).x = msg->at(c, r).x;
+					full_membrane->at(c, r).y = msg->at(c, r).y;
+					full_membrane->at(c, r).z = msg->at(c, r).z;	
+					
+					full_membrane->at(c, r).rgb = *reinterpret_cast<float*>(&white);
+
+					// 3D radius to check deformation
+					if (radius3d < radius3d_deform_limit) {
+						full_membrane->at(c, r).rgb = *reinterpret_cast<float*>(&green);
+					}
+				}				
+			}
+		}
+	}
+	
 
 
   // ----------------------------------------------------------------
   // -----Calculate surface normals with a search radius of 0.05-----
   // ----------------------------------------------------------------
-	// pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
-	// ne.setInputCloud (cloud_display);
-	// pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB> ());
-	// ne.setSearchMethod (tree);
-	// pcl::PointCloud<pcl::Normal>::Ptr cloud_normals (new pcl::PointCloud<pcl::Normal>);
-	// ne.setRadiusSearch (0.01);
-	// ne.compute (*cloud_normals);
-
-	cloud_display->width = (int) cloud_display->points.size ();
-	cloud_display->height = 1;
-	cloud_display_basic->width = (int) cloud_display_basic->points.size ();
-	cloud_display_basic->height = 1;
-
-	if (!SAVED) {
-		pcl::io::savePCDFileASCII("deformed.pcd", *cloud_display_basic);
-		SAVED = true;
-	}
-
-	viewer->updatePointCloud(cloud_display);
-
+  	//Calculate surface normals for organized point cloud
+  	pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
+  	pcl::IntegralImageNormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
+  	ne.setNormalEstimationMethod(ne.AVERAGE_3D_GRADIENT);
+  	ne.setMaxDepthChangeFactor(0.02f);
+  	ne.setNormalSmoothingSize(10.0f);
+  	ne.setInputCloud(full_membrane);
+  	ne.compute(*normals);
 
 	// viewer->removePointCloud("normals", 0);
-	// viewer->addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal> (cloud_display, cloud_normals, 10, 0.05, "normals");
+	// viewer->addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal> (full_membrane, normals, 10, 0.02, "normals"); 
+
+	// std::cout << "Normals: " <<  normals->width << " " << normals->height << " " << std::endl;
+	float total_concave_surface = 0.0;
+	int k = 10;
+	// We iterate through whole array slicing off margin of 1 
+	float total_deformed_surface = 0.0;
+
+	for (int c = k; c < 224 - k; c++) {
+		for (int r = k; r < 171 - k; r++) {
+			// Let's do column wise first (horizontal neighbours). Check if horizontal neighbours exist
+			if (pcl::isFinite(full_membrane->at(c-k, r)) && pcl::isFinite(full_membrane->at(c+k, r))) {
+				// Now check if vertical neighbours exist. Row-wise.
+				if (pcl::isFinite(full_membrane->at(c, r-k)) && pcl::isFinite(full_membrane->at(c, r+k))) {
+					float c_concavity = concavityOfPair(full_membrane->at(c-k, r), full_membrane->at(c+k, r), normals->at(c-k, r), normals->at(c+k, r));
+					float r_concavity = concavityOfPair(full_membrane->at(c, r-k), full_membrane->at(c, r+k), normals->at(c, r-k), normals->at(c, r+k));
+
+					// Check in here if deformed
+					float radius3d = sqrt(pow(msg->at(c, r).x - track_point.x, 2.0) + pow(msg->at(c, r).y - track_point.y, 2.0) + pow(msg->at(c, r).z - 0.09, 2.0));
+					bool deformed_bool = false;
+					if (radius3d < radius3d_deform_limit) {
+						float surface_area = surfaceElementArea(full_membrane->at(c, r), full_membrane->at(c-1, r), full_membrane->at(c+1, r), full_membrane->at(c, r-1), full_membrane->at(c, r+1));
+						total_deformed_surface += surface_area;
+						deformed_bool = true;
+					}
+
+					// Also check if this remains within bounds of where obstacle really is
+					float radius_2d_squared = pow(full_membrane->at(c, r).x, 2.0) + pow(full_membrane->at(c, r).y, 2.0);
+
+					// if ((c_concavity > 0 && r_concavity > 0) && radius_2d_squared <= 0.0002) {
+					if (c_concavity > 0 && r_concavity > 0 && deformed_bool) {
+
+						// See what local surface area this point covers
+						float surface_area = surfaceElementArea(full_membrane->at(c, r), full_membrane->at(c-1, r), full_membrane->at(c+1, r), full_membrane->at(c, r-1), full_membrane->at(c, r+1));
+						total_concave_surface += surface_area;
+						full_membrane->at(c, r).rgb = *reinterpret_cast<float*>(&red);
+					}
+				}
+			} 
+
+
+ 		}
+ 	}
+
+
+
+	if (SAVE_TO_PCD) {
+		pcl::io::savePCDFileASCII("deformed.pcd", *msg);
+		SAVE_TO_PCD = false;
+	}
+
+	// Show on the viewer
+	// sleep(1);
+	viewer->updatePointCloud(full_membrane, "cloud");
+	viewer->updatePointCloud(deformed_cloud, "deformed");
+
+	// std::cout << "Object area: " << total_concave_surface << std::endl;
+
+  	std_msgs::Float32 contact_area_msg;
+  	contact_area_msg.data = total_concave_surface;
+	contact_area_pub.publish(contact_area_msg);
+
+	std_msgs::Float32 deformed_area_msg;
+	deformed_area_msg.data = total_deformed_surface;
+	deformed_area_pub.publish(deformed_area_msg);
+
 
 }
+
 
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "sub_pcl");
 	ros::NodeHandle nh;
-	ros::Subscriber sub = nh.subscribe<PointCloud>("/royale_camera_driver/point_cloud", 1, callback);
+
+  // ------------------------------------
+  // -----Set parameters of the camera---
+  // ------------------------------------
+	if (SET_PARAMS) {
+		ros::Publisher use_case_pub = nh.advertise<std_msgs::String>("/use_case", 1);
+		ros::Publisher max_filter_pub = nh.advertise<std_msgs::Float32>("/max_filter", 1);
+		ros::Publisher min_filter_pub = nh.advertise<std_msgs::Float32>("/min_filter", 1);
+		ros::Publisher exposure_pub = nh.advertise<std_msgs::UInt32>("/expo_time", 1);
+
+		sleep(5);
+
+		std_msgs::String mode_msg;
+		std::stringstream ss;
+		ss << "MODE_5_45FPS_500";
+		mode_msg.data = ss.str();
+		use_case_pub.publish(mode_msg);
+
+		std_msgs::Float32 max_filter_msg;
+		max_filter_msg.data = 0.3;
+		max_filter_pub.publish(max_filter_msg);
+
+		std_msgs::Float32 min_filter_msg;
+		min_filter_msg.data = 0.06;
+		min_filter_pub.publish(min_filter_msg);
 
 
+		std_msgs::UInt32 expo_time_msg;
+		expo_time_msg.data = 50;
+		exposure_pub.publish(expo_time_msg);
+		sleep(3);
+
+		ros::spinOnce();	
+	}
 
   // ------------------------------------
   // -----Create example point cloud-----
   // ------------------------------------
 	pcl::PointCloud<pcl::PointXYZ>::Ptr basic_cloud_ptr (new pcl::PointCloud<pcl::PointXYZ>);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr point_cloud_ptr (new pcl::PointCloud<pcl::PointXYZRGB>);
-	std::cout << "Genarating example point clouds.\n\n";
-  // We're going to make an ellipse extruded along the z-axis. The colour for
-  // the XYZRGB cloud will gradually go from red to green to blue.
-	uint8_t r(255), g(15), b(15);
-	for (float z(-1.0); z <= 1.0; z += 0.05)
-	{
-		for (float angle(0.0); angle <= 360.0; angle += 5.0)
-		{
-			pcl::PointXYZ basic_point;
-			basic_point.x = 0.5 * cosf (pcl::deg2rad(angle));
-			basic_point.y = sinf (pcl::deg2rad(angle));
-			basic_point.z = z;
-			basic_cloud_ptr->points.push_back(basic_point);
+	std::cout << "Loading point cloud\n\n";
 
-			pcl::PointXYZRGB point;
-			point.x = basic_point.x;
-			point.y = basic_point.y;
-			point.z = basic_point.z;
-			uint32_t rgb = (static_cast<uint32_t>(r) << 16 |
-				static_cast<uint32_t>(g) << 8 | static_cast<uint32_t>(b));
-			point.rgb = *reinterpret_cast<float*>(&rgb);
-			point_cloud_ptr->points.push_back (point);
-		}
-		if (z < 0.0)
-		{
-			r -= 12;
-			g += 12;
-		}
-		else
-		{
-			g -= 12;
-			b += 12;
-		}
-	}
 	basic_cloud_ptr->width = (int) basic_cloud_ptr->points.size ();
 	basic_cloud_ptr->height = 1;
-	point_cloud_ptr->width = (int) point_cloud_ptr->points.size ();
+	point_cloud_ptr->width = (int) basic_cloud_ptr->points.size ();
 	point_cloud_ptr->height = 1;
+
 	viewer = simpleVis(point_cloud_ptr);
+	std::cout << "Loaded point cloud\n";
+
+  // ---------------------------
+  // -----Create publishers-----
+  // ---------------------------
+
+	deflection_pub = nh.advertise<std_msgs::Float32>("/deflection", 1);
+	contact_area_pub = nh.advertise<std_msgs::Float32>("/contact_area", 1);
+	deformed_area_pub = nh.advertise<std_msgs::Float32>("/deformed_area", 1);
+
+	sleep(2);
+
+  // -------------------------------------------------
+  // -----Load PCD cloud or subscribe to message -----
+  // -------------------------------------------------
+	if (LOAD_FROM_PCD) {
+		// Load PCD cloud file
+		pcl::PointCloud<pcl::PointXYZ>::Ptr load_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+		pcl::io::loadPCDFile("deformed.pcd", *load_cloud);
+		pcl::PointCloud<pcl::PointXYZ>::ConstPtr load_cloud_const (load_cloud);
+		callback(load_cloud_const);		
+	}
+
+	
+	ros::Subscriber sub = nh.subscribe<PointCloud>("/royale_camera_driver/point_cloud", 1, callback);
+	
 
 
 	while (!viewer->wasStopped ())

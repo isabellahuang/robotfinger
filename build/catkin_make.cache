@@ -1,2 +1,2 @@
-point_cloud_analyzer:sampleROS
+event_logger:point_cloud_analyzer:rosserial/rosserial:rosserial/rosserial_arduino:rosserial/rosserial_client:rosserial/rosserial_embeddedlinux:rosserial/rosserial_mbed:rosserial/rosserial_msgs:rosserial/rosserial_python:rosserial/rosserial_server:rosserial/rosserial_test:rosserial/rosserial_tivac:rosserial/rosserial_windows:rosserial/rosserial_xbee:rosserial_tutorials:sampleROS
 -DCATKIN_DEVEL_PREFIX=/home/isabella/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/isabella/catkin_ws/install -G Unix Makefiles

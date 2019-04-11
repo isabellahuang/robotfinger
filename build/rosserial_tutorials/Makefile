@@ -391,6 +391,21 @@ sensor_msgs_generate_messages_eus/fast:
 .PHONY : sensor_msgs_generate_messages_eus/fast
 
 # Convenience name for target.
+rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/rule:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/rule
+.PHONY : rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/rule
+
+# Convenience name for target.
+ros_arduino_dis_with_sub: rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/rule
+
+.PHONY : ros_arduino_dis_with_sub
+
+# fast build rule for target.
+ros_arduino_dis_with_sub/fast:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/build.make rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/build
+.PHONY : ros_arduino_dis_with_sub/fast
+
+# Convenience name for target.
 rosserial_tutorials/CMakeFiles/ros_arduino_trial_gennodejs.dir/rule:
 	cd /home/isabella/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 rosserial_tutorials/CMakeFiles/ros_arduino_trial_gennodejs.dir/rule
 .PHONY : rosserial_tutorials/CMakeFiles/ros_arduino_trial_gennodejs.dir/rule
@@ -585,6 +600,33 @@ ros_arduino_trial_geneus/fast:
 	cd /home/isabella/catkin_ws/build && $(MAKE) -f rosserial_tutorials/CMakeFiles/ros_arduino_trial_geneus.dir/build.make rosserial_tutorials/CMakeFiles/ros_arduino_trial_geneus.dir/build
 .PHONY : ros_arduino_trial_geneus/fast
 
+src/dis_with_sub.o: src/dis_with_sub.cpp.o
+
+.PHONY : src/dis_with_sub.o
+
+# target to build an object file
+src/dis_with_sub.cpp.o:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/build.make rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/src/dis_with_sub.cpp.o
+.PHONY : src/dis_with_sub.cpp.o
+
+src/dis_with_sub.i: src/dis_with_sub.cpp.i
+
+.PHONY : src/dis_with_sub.i
+
+# target to preprocess a source file
+src/dis_with_sub.cpp.i:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/build.make rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/src/dis_with_sub.cpp.i
+.PHONY : src/dis_with_sub.cpp.i
+
+src/dis_with_sub.s: src/dis_with_sub.cpp.s
+
+.PHONY : src/dis_with_sub.s
+
+# target to generate assembly for a file
+src/dis_with_sub.cpp.s:
+	cd /home/isabella/catkin_ws/build && $(MAKE) -f rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/build.make rosserial_tutorials/CMakeFiles/ros_arduino_dis_with_sub.dir/src/dis_with_sub.cpp.s
+.PHONY : src/dis_with_sub.cpp.s
+
 src/interrupt_with_blink_sub.o: src/interrupt_with_blink_sub.cpp.o
 
 .PHONY : src/interrupt_with_blink_sub.o
@@ -773,6 +815,7 @@ help:
 	@echo "... sensor_msgs_generate_messages_py"
 	@echo "... list_install_components"
 	@echo "... sensor_msgs_generate_messages_eus"
+	@echo "... ros_arduino_dis_with_sub"
 	@echo "... ros_arduino_trial_gennodejs"
 	@echo "... ros_arduino_servo_with_sub"
 	@echo "... geometry_msgs_generate_messages_cpp"
@@ -788,6 +831,9 @@ help:
 	@echo "... ros_arduino_trial_generate_messages_cpp"
 	@echo "... ros_arduino_trial_generate_messages_eus"
 	@echo "... ros_arduino_trial_geneus"
+	@echo "... src/dis_with_sub.o"
+	@echo "... src/dis_with_sub.i"
+	@echo "... src/dis_with_sub.s"
 	@echo "... src/interrupt_with_blink_sub.o"
 	@echo "... src/interrupt_with_blink_sub.i"
 	@echo "... src/interrupt_with_blink_sub.s"
